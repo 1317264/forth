@@ -1,0 +1,3 @@
+运行时将crawlerdownload文件夹放到D盘
+通过修改start和end的值来确定爬取范围
+小说默认爬取20章，如需爬取整部则按NovelCrawler第29行的注释修改
