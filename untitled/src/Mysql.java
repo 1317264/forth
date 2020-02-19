@@ -10,37 +10,21 @@ public class Mysql {
     public Connection conn = null;
     public PreparedStatement pst = null;
 
-    public void Save(String sql) {
-        try {
-            Class.forName(name);
-            conn = DriverManager.getConnection(url, user, password);
-            pst = conn.prepareStatement(sql);
-            pst.execute();
-        } catch (Exception e) {
-            System.out.println("储存失败");
-        } finally {
-            try {
-                this.conn.close();
-                this.pst.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
-    public void SaveContent(int id,int chapter,File file){
+    public void SaveChapter(int id,int chapter,String titie,File file){
         try{
-            String sql = "insert into content values (?,?,?)";
+            String sql = "insert into chapter values (?,?,?,?)";
             Class.forName(name);
             conn = DriverManager.getConnection(url, user, password);
             pst = conn.prepareStatement(sql);
             pst.setInt(1,id);
             pst.setInt(2,chapter);
+            pst.setString(3,titie);
             FileReader fileReader=new FileReader(file);
-            pst.setCharacterStream(3, fileReader , (int)file.length());
+            pst.setCharacterStream(4, fileReader , (int)file.length());
             pst.execute();
         }catch (Exception e){
-            System.out.println("小说内容储存失败");
+            System.out.println("章节储存失败");
         }finally {
             try {
                 this.conn.close();
@@ -118,6 +102,72 @@ public class Mysql {
             pst.execute();
         } catch (Exception e) {
             System.out.println("电影储存失败");
+        } finally {
+            try {
+                this.conn.close();
+                this.pst.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void SaveDirector(int id,int num,String director) {
+        try {
+            String sql = "insert into director values (?,?,?)";
+            Class.forName(name);
+            conn = DriverManager.getConnection(url, user, password);
+            pst = conn.prepareStatement(sql);
+            pst.setInt(1,id);
+            pst.setInt(2,num);
+            pst.setString(3,director);
+            pst.execute();
+        } catch (Exception e) {
+            System.out.println("导演储存失败");
+        } finally {
+            try {
+                this.conn.close();
+                this.pst.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void SaveScreenwriter(int id,int num,String screenwriter) {
+        try {
+            String sql = "insert into screenwriter values (?,?,?)";
+            Class.forName(name);
+            conn = DriverManager.getConnection(url, user, password);
+            pst = conn.prepareStatement(sql);
+            pst.setInt(1,id);
+            pst.setInt(2,num);
+            pst.setString(3,screenwriter);
+            pst.execute();
+        } catch (Exception e) {
+            System.out.println("编剧储存失败");
+        } finally {
+            try {
+                this.conn.close();
+                this.pst.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void SaveActor(int id,int num,String actor) {
+        try {
+            String sql = "insert into actor values (?,?,?)";
+            Class.forName(name);
+            conn = DriverManager.getConnection(url, user, password);
+            pst = conn.prepareStatement(sql);
+            pst.setInt(1,id);
+            pst.setInt(2,num);
+            pst.setString(3,actor);
+            pst.execute();
+        } catch (Exception e) {
+            System.out.println("演员储存失败");
         } finally {
             try {
                 this.conn.close();
