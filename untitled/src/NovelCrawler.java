@@ -1,6 +1,5 @@
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
@@ -11,52 +10,51 @@ public class NovelCrawler {
     public static void main(String[] args) {
         Mysql mysql=new Mysql();
         int start=1;
-        int end=20;//爬取小说id范围
+        int end=10;//爬取小说id范围
         for(int i=start;i<=end;i++)
         {
-            String url1="https://www.52bqg.com/book_"+String.valueOf(i)+"/";
-            System.out.println(url1);
+            String strurl="https://www.52bqg.com/book_"+String.valueOf(i)+"/";
+            System.out.println(strurl);
             try{
-                Document doc1=Jsoup.connect(url1)
+                Document doc=Jsoup.connect(strurl)
                         .userAgent("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; MALC)")
                         .timeout(999999999)
                         .get();
-                Elements elements0=doc1.getElementsByClass("blocktitle");
-                if(!elements0.text().equals("出现错误！")){
+                Elements elements=doc.select("[class=blocktitle]");
+                if(elements.isEmpty()){
                     //下载小说内容，将各章标题和内容存到数据库
-                    Elements elements1=doc1.select("[id=list]>dl>dd>a");
-                    String href;
-                    for(int j=0;j<20;j++){//此处下载20章，若需储存整部小说则将20改为elements1.size()
-                        if(j<elements1.size()){
-                            href=elements1.get(j).attr("href");
-                            Document doc2=Jsoup.connect(url1+href).timeout(999999999).get();
-                            Element element2=doc2.getElementById("content");
-                            Elements elements2=element2.getElementsByTag("div");
-                            String text=elements2.text().replace(" ","\n");
-                            File file1=new File("D:\\crawlerdownload\\novelcontent\\"
+                    elements=doc.select("[id=list]>dl>dd>a");
+                    for(int j=0;j<10;j++){//此处下载10章，若需储存整部小说则将10改为elements1.size()
+                        if(j<elements.size()){
+                            String href=elements.get(j).attr("href");
+                            Document doc1=Jsoup.connect(strurl+href)
+                                    .userAgent("Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0; MALC)")
+                                    .timeout(999999999)
+                                    .get();
+                            Elements elements1=doc1.select("[id=content]");
+                            String text=elements1.text().replace(" ","\n").replace("'","\'");
+                            File file=new File("D:\\crawlerdownload\\novelcontent\\"
                                     +String.valueOf(i)+"_"+String.valueOf(j+1)+".txt");
-                            FileWriter fw=new FileWriter(file1);
+                            FileWriter fw=new FileWriter(file);
                             fw.write(text);
                             fw.close();
-                            mysql.SaveContent(i,j+1,file1);
 
-                            Elements elements3=doc2.select("[class=bookname]>h1");
-                            String title=elements3.text();
-                            String sql2="insert into title values("+String.valueOf(i)+","+String.valueOf(j+1)+",'"+title+"')";
-                            mysql.Save(sql2);
+                            elements1=doc1.select("[class=bookname]>h1");
+                            String title=elements1.first().text().replace("'","\'");
+                            mysql.SaveChapter(i,j+1,title,file);
                         }
                     }
                     //下载小说封面
-                    Elements elements2=doc1.select("[id=fmimg]>img");
-                    String imgurl=elements2.attr("src");
+                    elements=doc.select("[id=fmimg]>img");
+                    String imgurl=elements.attr("src");
                     String fileName = imgurl.substring(imgurl.lastIndexOf('/') + 1, imgurl.length());
-                    File file2=new File("D:\\crawlerdownload\\novelcover\\"+fileName);
+                    File file=new File("D:\\crawlerdownload\\novelcover\\"+fileName);
                     try{
                         URL url=new URL(imgurl);
                         URLConnection conn=url.openConnection();
                         conn.setConnectTimeout(10 * 1000);
                         InputStream in = conn.getInputStream();
-                        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file2));
+                        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
                         byte[] buf = new byte[1024];
                         int size;
                         while (-1 != (size = in.read(buf))) {
@@ -67,15 +65,14 @@ public class NovelCrawler {
                     }catch (Exception e){
                         e.printStackTrace();
                     }
-                    //获取其他数据
-                    Elements elements3=doc1.select("[id=info]>h1");
-                    String title=elements3.text();
-                    Elements elements4=doc1.select("[id=info]>p>a");
-                    String writer=elements4.first().text();
-                    Element element2=doc1.getElementById("intro");
-                    String introduction=element2.text();
-                    //存到数据库
-                    mysql.SaveNovel(i,title,writer,introduction,file2);
+                    //获取其他数据存到数据库
+                    elements=doc.select("[id=info]>h1");
+                    String title=elements.first().text().replace("'","\'");
+                    elements=doc.select("[id=info]>p>a");
+                    String writer=elements.first().text().replace("'","\'");
+                    elements=doc.select("[id=intro]");
+                    String introduction=elements.first().text().replace("'","\'");
+                    mysql.SaveNovel(i,title,writer,introduction,file);
                     System.out.println("完成");
                 }
                 else{
