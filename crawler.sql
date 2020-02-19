@@ -10,22 +10,14 @@ introduction TEXT,
 cover BLOB
 );
 
-CREATE TABLE title
+CREATE TABLE chapter
 (
 id INT NOT NULL,
 chapter INT,
 title VARCHAR(255),
-UNIQUE(id,chapter)
-);
-
-CREATE TABLE content
-(
-id INT NOT NULL,
-chapter INT,
 content MEDIUMTEXT,
 UNIQUE(id,chapter)
 );
-
 
 CREATE TABLE movie
 (
@@ -35,11 +27,11 @@ title varchar(255),
 time varchar(10),
 score FLOAT,
 scorenum INT,
-5star VARCHAR(6),
-4star VARCHAR(6),
-3star VARCHAR(6),
-2star VARCHAR(6),
-1star VARCHAR(6)
+star5 VARCHAR(6),
+star4 VARCHAR(6),
+star3 VARCHAR(6),
+star2 VARCHAR(6),
+star1 VARCHAR(6)
 );
 
 CREATE TABLE director
