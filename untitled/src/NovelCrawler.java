@@ -24,7 +24,7 @@ public class NovelCrawler {
                 if(elements.isEmpty()){
                     //下载小说内容，将各章标题和内容存到数据库
                     elements=doc.select("[id=list]>dl>dd>a");
-                    for(int j=0;j<10;j++){//此处下载10章，若需储存整部小说则将10改为elements1.size()
+                    for(int j=0;j<10;j++){//此处下载10章，若需储存整部小说则将10改为elements.size()
                         if(j<elements.size()){
                             String href=elements.get(j).attr("href");
                             Document doc1=Jsoup.connect(strurl+href)
